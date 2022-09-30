@@ -1,13 +1,5 @@
-// base color
-$orange: #FDA214;
-$lightBlue: #BCCED9;
-$darkBlue: #304859;
-$black: #152938;
-$grey: #F2F2F2;
-$darkTeal: #7191A5;
-$blue: #6395E8;
-$white: #FCFCFC;
-
+@import "./variables.scss";
+@import "./button.scss";
 
 @font-face {
   font-family: "AtkinsonHyperlegible";
@@ -19,7 +11,8 @@ $white: #FCFCFC;
 body {
   font-family: "AtkinsonHyperlegible";
   font-size: 18px;
-  color: $black;
+  color: $white;
+  background-color: $black;
   height: 100%;
   width: 100%;
 }

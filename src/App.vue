@@ -1,12 +1,21 @@
 
 <template>
   <div id="app">
-    MEMORY GAME
+    <setting @startGame="startGame"/>
   </div>
 </template>
 
 <script>
+import Setting from "@/components/setting.vue"
 export default {
+  components: {
+    Setting
+  },
+  methods: {
+    startGame(val) {
+      console.log("start game with val ->", val)
+    }
+  }
 };
 </script>
 
