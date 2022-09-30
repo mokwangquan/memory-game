@@ -1,0 +1,41 @@
+// base color
+$orange: #FDA214;
+$lightBlue: #BCCED9;
+$darkBlue: #304859;
+$black: #152938;
+$grey: #F2F2F2;
+$darkTeal: #7191A5;
+$blue: #6395E8;
+$white: #FCFCFC;
+
+
+@font-face {
+  font-family: "AtkinsonHyperlegible";
+  unicode-range: U+000-5FF;
+  src: local("AtkinsonHyperlegible"),
+    url("./assets/fonts/AtkinsonHyperlegible-Bold.ttf") format("truetype")
+}
+
+body {
+  font-family: "AtkinsonHyperlegible";
+  font-size: 18px;
+  color: $black;
+  height: 100%;
+  width: 100%;
+}
+
+h1 {
+  font-size: 48px;
+}
+h2 {
+  font-size: 32px;
+}
+h3 {
+  font-size: 20px;
+}
+.four-game-number {
+  font-size: 44px;
+}
+.six-game-number {
+  font-size: 56px;
+}
