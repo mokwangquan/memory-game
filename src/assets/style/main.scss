@@ -8,11 +8,18 @@
     url("./assets/fonts/AtkinsonHyperlegible-Bold.ttf") format("truetype")
 }
 
+html {
+  height: 100%;
+  scroll-behavior: smooth;
+}
+
+body::-webkit-scrollbar { display: none } // hide scrollbar
+
 body {
   font-family: "AtkinsonHyperlegible";
   font-size: 18px;
   color: $white;
-  background-color: $black;
+  background-color: $white;
   height: 100%;
   width: 100%;
 }
@@ -31,4 +38,59 @@ h3 {
 }
 .six-game-number {
   font-size: 56px;
+}
+
+.text-white {
+  color: $white;
+  &:hover,
+  &:focus {
+    color: $white;
+  }
+}
+.text-black {
+  color: $black;
+  &:hover,
+  &:focus {
+    color: $black;
+  }
+}
+.text-dark-teal {
+  color: $darkTeal;
+  &:hover,
+  &:focus {
+    color: $darkTeal;
+  }
+}
+
+.w-auto {
+  width: auto
+}
+
+.bg-orange {
+  background-color: $orange;
+  &:hover:not(.no-hover){
+    background-color: $orange;
+    opacity: 0.8;
+  }
+  &:focus:not(.no-hover) {
+    background-color: $orange;
+  }
+}
+.bg-black {
+  background-color: $black;
+  &:hover:not(.no-hover) {
+    background-color: $blue;
+  }
+  &:focus:not(.no-hover) {
+    background-color: $black;
+  }
+}
+.bg-idle {
+  background-color: $lightBlue;
+  &:hover:not(.no-hover) {
+    background-color: $blue;
+  }
+  &:focus:not(.no-hover) {
+    background-color: $lightBlue;
+  }
 }

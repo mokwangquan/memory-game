@@ -1,19 +1,43 @@
 
 <template>
   <div id="app">
-    <setting @startGame="startGame"/>
+    <setting 
+      v-if="stage === 'setting'" 
+      @startGame="startGame"
+    />
+    <game 
+      v-if="stage === 'game'" 
+      :setup="setup"
+      @exit="exitGame"
+    />
   </div>
 </template>
 
 <script>
 import Setting from "@/components/setting.vue"
+import Game from "@/components/game.vue"
 export default {
   components: {
-    Setting
+    Setting, Game
+  },
+  data() {
+    return {
+      stage: "game",
+      setup: {
+        theme: "numbers",
+        noOfPlayers: 4,
+        grid: "6x6"
+      }, // change me
+    }
   },
   methods: {
     startGame(val) {
-      console.log("start game with val ->", val)
+      this.setup = val
+      this.stage = "game"
+    },
+    exitGame() {
+      this.setup = {}
+      this.stage = "setting"
     }
   }
 };

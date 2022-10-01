@@ -6,26 +6,4 @@
   font-size: 20px;
   width: 100%;
   border: 0;
-
-  &.orange {
-    background-color: $orange;
-    &:hover {
-      opacity: 0.8;
-    }
-  }
-  &.black {
-    background-color: $black;
-    &:hover {
-      background-color: $blue;
-    }
-  }
-  &.idle {
-    background-color: $lightBlue;
-    &:hover {
-      background-color: $blue;
-    }
-  }
-  &.text-white {
-    color: $white
-  }
 }

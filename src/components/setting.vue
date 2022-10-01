@@ -15,7 +15,7 @@
     <el-row type="flex" justify="space-between" align="middle" :gutter="40">
       <el-col>
         <el-button 
-          :class="theme=='numbers' ? 'black text-white' : 'idle text-white'"
+          :class="theme=='numbers' ? 'bg-black text-white' : 'bg-idle text-white'"
           @click="theme='numbers'"
         >
           Numbers
@@ -23,7 +23,7 @@
       </el-col>
       <el-col>
         <el-button 
-          :class="theme=='icons' ? 'black text-white' : 'idle text-white'"
+          :class="theme=='icons' ? 'bg-black text-white' : 'bg-idle text-white'"
           @click="theme='icons'"
         >
           Icons
@@ -38,7 +38,7 @@
         :key="el"
       >
         <el-button 
-          :class="noOfPlayers==el ? 'black text-white' : 'idle text-white'"
+          :class="noOfPlayers==el ? 'bg-black text-white' : 'bg-idle text-white'"
           @click="noOfPlayers=el"
         >
           {{ el }}
@@ -50,7 +50,7 @@
     <el-row type="flex" justify="space-between" align="middle" :gutter="40">
       <el-col>
         <el-button
-          :class="grid=='4x4' ? 'black text-white' : 'idle text-white'"
+          :class="grid=='4x4' ? 'bg-black text-white' : 'bg-idle text-white'"
           @click="grid='4x4'"
         >
           4x4
@@ -58,7 +58,7 @@
       </el-col>
       <el-col>
         <el-button
-          :class="grid=='6x6' ? 'black text-white' : 'idle text-white'"
+          :class="grid=='6x6' ? 'bg-black text-white' : 'bg-idle text-white'"
           @click="grid='6x6'"
         >
           6x6
@@ -66,7 +66,7 @@
       </el-col>
     </el-row>
 
-    <el-button class="start-game-button orange text-white" @click="startGame">
+    <el-button class="start-game-button bg-orange text-white" @click="startGame">
       Start Game
     </el-button>
   </el-dialog>
