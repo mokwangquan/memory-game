@@ -21,6 +21,7 @@
           v-for="col, y in row"
           :key="'y_'+y"
           :class="getClass(x, y)"
+          @click.native="handleClick(x, y)"
         >
           <div>
             {{ col }}
@@ -80,7 +81,7 @@
             align="middle"
           >
             <span>Time</span>
-            <h2>{{ time }}</h2>
+            <h2>{{ formattedTime }}</h2>
           </el-row>
         </el-col>
         <el-col
@@ -101,6 +102,7 @@
 </template>
 
 <script>
+import moment from "moment"
 export default {
   name: "Game",
   props: {
@@ -111,30 +113,102 @@ export default {
       grid: [],
       allPlayerScore: [],
       currentPlayerIndex: 0,
+      intervalId: null,
       // Solo
-      time: "0:01",
+      timeElapse: moment.duration(0, "s"),
       moves: 0,
+      // actions
+      actionIndex: 0,
+      firstClickedXY: [],
+      secondClickedXY: [],
+      successNumList: []
+
+    }
+  },
+  computed: {
+    formattedTime() {
+      return moment.utc(this.timeElapse.asMilliseconds()).format("m:ss");
     }
   },
   methods: {
     constructGrid() {
       this.grid = []
+      let numVault = []
       let repeatNum = 6
       if (this.setup.grid === '4x4') repeatNum = 4
+
+      let nextNum = 1
+      for (let i = 0; i < (repeatNum * 2); i++) {
+        numVault.push(nextNum)
+        numVault.push(nextNum)
+        nextNum++
+      }
+
+      numVault = this.shuffleList(numVault)
+      numVault = this.shuffleList(numVault) // twice better :D
 
       for (let i = 0; i < repeatNum; i++) {
         let row = []
         for (let i = 0; i < repeatNum; i++) {
-          row.push(1)
+          row.push(numVault.pop())
         }
         this.grid.push(row)
       }
+    },
+    shuffleList(array) {
+      let currentIndex = array.length,  randomIndex;
+
+      // While there remain elements to shuffle.
+      while (currentIndex != 0) {
+
+        // Pick a remaining element.
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+
+        // And swap it with the current element.
+        [array[currentIndex], array[randomIndex]] = [
+          array[randomIndex], array[currentIndex]];
+      }
+
+      return array;
     },
     resetScoring() {
       this.allPlayerScore = []
 
       for (let i = 0; i < this.setup.noOfPlayers; i++) {
         this.allPlayerScore.push(0)
+      }
+    },
+    handleClick(x, y) {
+      const isSucceed = this.successNumList.find(el => el == this.grid[x][y]) != null
+      if (isSucceed) return
+
+      if (this.intervalId == null) this.startTimer()
+
+
+      if (this.actionIndex === 0) {
+        this.firstClickedXY = [x, y]
+        this.actionIndex = 1
+      
+      // repeat
+      } else if (this.actionIndex === 1) {
+        this.secondClickedXY = [x, y]
+        this.actionIndex = 2
+        this.moves++
+        this.checkMatched()
+
+        setTimeout(() => {
+          this.firstClickedXY = []
+          this.secondClickedXY = []
+          this.actionIndex = 0
+        }, 500)
+      }
+    },
+    checkMatched() {
+      const num1 = this.grid[this.firstClickedXY[0]][this.firstClickedXY[1]]
+      const num2 = this.grid[this.secondClickedXY[0]][this.secondClickedXY[1]]
+      if (num1 === num2) {
+        this.successNumList.push(num1)
       }
     },
     getClass(x, y) {
@@ -145,17 +219,38 @@ export default {
         result += "six-by-six "
       }
 
-      if (x > 3 && y > 2) {
+      const isClicked = (this.firstClickedXY[0] === x && this.firstClickedXY[1] === y)
+                        || (this.secondClickedXY[0] === x && this.secondClickedXY[1] === y)
+      const isSuccess = this.successNumList.find(el => el == this.grid[x][y]) != null
+
+      if (isClicked) {
         result += "bg-orange "
-      } else if (x > 1) {
+      } else if (isSuccess) {
         result += "bg-idle "
       } else {
         result += "bg-black "
       }
+
+      if (this.actionIndex === 2) {
+        result += "no-hover "
+      }
       return result
     },
+    startTimer() {
+      if (this.intervalId != null) {
+        clearInterval(this.intervalId)
+      }
+      this.timeElapse = moment.duration(0, "s")
+      this.intervalId = setInterval(() => {
+        this.timeElapse.add(1, "s")
+      }, 1000);
+    },
+    stopTimer() {
+      clearInterval(this.intervalId);
+      this.intervalId = null
+    },
     restart() {
-
+      //TODO
     },
   },
   mounted() {
