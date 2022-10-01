@@ -7,3 +7,62 @@ $grey: #F2F2F2;
 $darkTeal: #7191A5;
 $blue: #6395B8;
 $white: #FCFCFC;
+
+
+.text-white {
+  color: $white;
+  &:hover,
+  &:focus {
+    color: $white;
+  }
+}
+.text-black {
+  color: $black;
+  &:hover,
+  &:focus {
+    color: $black;
+  }
+}
+.text-dark-teal {
+  color: $darkTeal;
+  &:hover,
+  &:focus {
+    color: $darkTeal;
+  }
+}
+
+.w-auto {
+  width: auto !important
+}
+.w-100 {
+  width: 100% !important
+}
+
+.bg-orange {
+  background-color: $orange !important;
+  &:hover:not(.no-hover){
+    background-color: $orange !important;
+    opacity: 0.8;
+  }
+  &:focus:not(.no-hover) {
+    background-color: $orange !important;
+  }
+}
+.bg-black {
+  background-color: $black !important;
+  &:hover:not(.no-hover) {
+    background-color: $blue !important;
+  }
+  &:focus:not(.no-hover) {
+    background-color: $black !important;
+  }
+}
+.bg-idle {
+  background-color: $lightBlue !important;
+  &:hover:not(.no-hover) {
+    background-color: $blue !important;
+  }
+  &:focus:not(.no-hover) {
+    background-color: $lightBlue !important;
+  }
+}

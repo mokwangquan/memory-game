@@ -26,7 +26,7 @@ export default {
       setup: {
         theme: "numbers",
         noOfPlayers: 4,
-        grid: "6x6"
+        grid: "4x4"
       }, // change me
     }
   },

@@ -52,6 +52,7 @@
             type="flex"
             justify="space-between"
             align="middle"
+            class="block no-hover bg-idle"
           >
             <span>Player {{ index + 1 }}</span>
             <h2>{{ score }}</h2>
@@ -79,6 +80,7 @@
             type="flex"
             justify="space-between"
             align="middle"
+            class="block no-hover bg-idle"
           >
             <span>Time</span>
             <h2>{{ formattedTime }}</h2>
@@ -91,6 +93,7 @@
             type="flex"
             justify="space-between"
             align="middle"
+            class="block no-hover bg-idle"
           >
             <span>Moves</span>
             <h2>{{ moves }}</h2>
@@ -98,11 +101,71 @@
         </el-col>
       </el-row>
     </div>
+
+    <!-- Game over dialog -->
+    <el-dialog
+      id="game-over-dialog"
+      :visible.sync="isGameOver"
+      width="35%"
+      :show-close="false"
+      :close-on-press-escape="false"
+      :close-on-click-modal="false"
+    >
+      <h1 v-if="isSolo">You did it!</h1>
+      <h1 v-else>{{ winnerIndexList.length > 1 ? 'It\'s a tie!' : `Player ${winnerIndexList[0] + 1} Wins!` }}</h1>
+
+      <p v-if="isSolo">Game over! Here's how you got on...</p>
+      <p v-else>Game over! Here are the results...</p>
+
+      <div class="summary" v-if="isSolo">
+        <el-row
+          type="flex"
+          justify="space-between"
+          align="middle"
+          class="block no-hover bg-idle"
+        >
+          <span>Time Elapsed</span>
+          <h2>{{ formattedTime }}</h2>
+        </el-row>
+        <el-row
+          type="flex"
+          justify="space-between"
+          align="middle"
+          class="block no-hover bg-idle"
+        >
+          <span>Moves Taken</span>
+          <h2>{{ moves }}</h2>
+        </el-row>
+      </div>
+
+      <div class="summary" v-else>
+        <el-row
+          type="flex"
+          justify="space-between"
+          align="middle"
+          class="no-hover"
+          :class="isWinner ? 'block bg-black text-white' : 'block bg-idle'"
+          v-for="{score, index, isWinner} in allPlayerSummaryInOrder"
+          :key="'score_'+index"
+        >
+          <span>Player {{ index + 1 }} {{ isWinner ? '(Winner!)' : '' }}</span>
+          <h2>{{ score }} Pairs</h2>
+        </el-row>
+      </div>
+
+      <el-row class="action-button-row" type="flex" justify="space-between" align="middle">
+        <el-button class="bg-orange text-white" @click="restart()">Restart</el-button>
+        <el-button class="bg-idle text-black" @click="$emit('exit')">Setup New Game</el-button>
+      </el-row>
+
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import moment from "moment"
+import cloneDeep from "lodash/cloneDeep"
+
 export default {
   name: "Game",
   props: {
@@ -117,11 +180,14 @@ export default {
       firstClickedXY: [],
       secondClickedXY: [],
       successNumList: [],
+      isGameOver: true,
       // Solo
       timeElapse: moment.duration(0, "s"),
       // Multiplayer
-      allPlayerScore: [],
+      allPlayerScore: [6,3,5,1],
+      allPlayerSummaryInOrder: [],
       currentPlayerIndex: 0,
+      winnerIndexList: [],
 
     }
   },
@@ -130,8 +196,8 @@ export default {
       return moment.utc(this.timeElapse.asMilliseconds()).format("m:ss");
     },
     isSolo() {
-      return this.grid.noOfPlayers === 1
-    }
+      return this.setup.noOfPlayers === 1
+    },
   },
   watch: {
     successNumList: {
@@ -187,10 +253,10 @@ export default {
       return array;
     },
     resetScoring() {
-      this.allPlayerScore = []
+      // this.allPlayerScore = [] // change me back
 
       for (let i = 0; i < this.setup.noOfPlayers; i++) {
-        this.allPlayerScore.push(0)
+        // this.allPlayerScore.push(0) // change me back
       }
     },
     handleClick(x, y) {
@@ -277,8 +343,29 @@ export default {
       this.intervalId = null
     },
     handleGameOver() {
-      console.log("END")
-      //END
+      // Solo
+      this.stopTimer()
+
+      // Multiplayer
+      const sorted = cloneDeep(this.allPlayerScore).sort()
+      const highest = sorted[sorted.length-1]
+
+      this.allPlayerScore.forEach((score, index) => {
+        console.log(score, index)
+        let player = {
+          score, index,
+          isWinner: false
+        }
+        if (score === highest) {
+          this.winnerIndexList.push(index)
+          player.isWinner = true
+        }
+        this.allPlayerSummaryInOrder.push(player)
+      })
+
+      this.allPlayerSummaryInOrder.sort((a, b) => b.score - a.score)
+
+      this.isGameOver = true
     },
     restart() {
       //TODO
@@ -287,6 +374,8 @@ export default {
   mounted() {
     this.constructGrid()
     this.resetScoring()
+    
+    this.handleGameOver()
   }
 }
 </script>
@@ -323,8 +412,8 @@ export default {
       &.bg-black {
         color: $black;
         >div {
-          // color: $white;
-          visibility: hidden;
+          color: $white;
+          // visibility: hidden;
         }
       }
       &.bg-idle {
@@ -335,15 +424,19 @@ export default {
     }
   }
 
+  .block {
+    height: 4rem;
+    border-radius: 10px;
+  }
+
   #solo-info-row,
   #player-row {
     margin-top: 4rem;
     text-align: center;
     >.el-row>.el-col {
+      @extend .block;
       margin: auto 0.8rem;
-      height: 3rem;
       width: 12rem;
-      border-radius: 10px;
       &:first-child { margin-left: 0 }
       &:last-child { margin-right: 0 }
       >.el-row {
@@ -372,6 +465,28 @@ export default {
         text-align: center;
         letter-spacing: 4px;
         font-size: 10px;
+      }
+    }
+  }
+
+  #game-over-dialog {
+    .el-dialog {
+      border-radius: 10px;
+      padding: 30px;
+      .el-dialog__header { display: none }
+      .el-dialog__body {
+        text-align: center;
+        h1 { margin-top: 0 }
+        .summary {
+          margin-top: 2rem;
+          .block {
+            margin-top: 1rem;
+            padding: 1rem;
+          }
+        }
+        .action-button-row {
+          margin-top: 2rem;
+        }
       }
     }
   }
