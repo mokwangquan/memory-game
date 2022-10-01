@@ -30,7 +30,7 @@
       </el-row>
     </div>
 
-    <div v-if="setup.noOfPlayers > 1" id="player-row">
+    <div v-if="!isSolo" id="player-row">
       <el-row
         type="flex"
         justify="center"
@@ -111,23 +111,37 @@ export default {
   data() {
     return {
       grid: [],
-      allPlayerScore: [],
-      currentPlayerIndex: 0,
       intervalId: null,
-      // Solo
-      timeElapse: moment.duration(0, "s"),
       moves: 0,
-      // actions
       actionIndex: 0,
       firstClickedXY: [],
       secondClickedXY: [],
-      successNumList: []
+      successNumList: [],
+      // Solo
+      timeElapse: moment.duration(0, "s"),
+      // Multiplayer
+      allPlayerScore: [],
+      currentPlayerIndex: 0,
 
     }
   },
   computed: {
     formattedTime() {
       return moment.utc(this.timeElapse.asMilliseconds()).format("m:ss");
+    },
+    isSolo() {
+      return this.grid.noOfPlayers === 1
+    }
+  },
+  watch: {
+    successNumList: {
+      handler(list) {
+        let num = 6
+        if (this.setup.grid === '4x4') num = 4
+        if (list.length === (num*2)) {
+          this.handleGameOver()
+        }
+      }, deep: true
     }
   },
   methods: {
@@ -183,9 +197,6 @@ export default {
       const isSucceed = this.successNumList.find(el => el == this.grid[x][y]) != null
       if (isSucceed) return
 
-      if (this.intervalId == null) this.startTimer()
-
-
       if (this.actionIndex === 0) {
         this.firstClickedXY = [x, y]
         this.actionIndex = 1
@@ -196,6 +207,12 @@ export default {
         this.actionIndex = 2
         this.moves++
         this.checkMatched()
+
+        if (this.isSolo && this.intervalId == null) this.startTimer()
+
+        if (!this.isSolo) {
+          this.changePlayer()
+        }
 
         setTimeout(() => {
           this.firstClickedXY = []
@@ -209,6 +226,16 @@ export default {
       const num2 = this.grid[this.secondClickedXY[0]][this.secondClickedXY[1]]
       if (num1 === num2) {
         this.successNumList.push(num1)
+        if (!this.isSolo) {
+          this.allPlayerScore[this.currentPlayerIndex]++
+          // TODO: add animation gained point
+        }
+      }
+    },
+    changePlayer() {
+      this.currentPlayerIndex++
+      if ((this.currentPlayerIndex+1) > this.setup.noOfPlayers) {
+        this.currentPlayerIndex = 0
       }
     },
     getClass(x, y) {
@@ -248,6 +275,10 @@ export default {
     stopTimer() {
       clearInterval(this.intervalId);
       this.intervalId = null
+    },
+    handleGameOver() {
+      console.log("END")
+      //END
     },
     restart() {
       //TODO
@@ -292,6 +323,7 @@ export default {
       &.bg-black {
         color: $black;
         >div {
+          // color: $white;
           visibility: hidden;
         }
       }
