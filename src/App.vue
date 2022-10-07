@@ -22,12 +22,12 @@ export default {
   },
   data() {
     return {
-      stage: "game",
+      stage: "setting",
       setup: {
-        theme: "numbers",
+        theme: "icons",
         noOfPlayers: 4,
         grid: "4x4"
-      }, // change me
+      },
     }
   },
   methods: {

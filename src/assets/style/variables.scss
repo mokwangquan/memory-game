@@ -10,24 +10,24 @@ $white: #FCFCFC;
 
 
 .text-white {
-  color: $white;
+  color: $white !important;
   &:hover,
   &:focus {
-    color: $white;
+    color: $white !important;
   }
 }
 .text-black {
-  color: $black;
+  color: $black !important;
   &:hover,
   &:focus {
-    color: $black;
+    color: $black !important;
   }
 }
 .text-dark-teal {
-  color: $darkTeal;
+  color: $darkTeal !important;
   &:hover,
   &:focus {
-    color: $darkTeal;
+    color: $darkTeal !important;
   }
 }
 

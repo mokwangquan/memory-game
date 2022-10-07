@@ -23,7 +23,10 @@
           :class="getClass(x, y)"
           @click.native="handleClick(x, y)"
         >
-          <div>
+          <div v-if="setup.theme === 'icons'">
+            <i :class="icons[col-1]" />
+          </div>
+          <div v-else>
             {{ col }}
           </div>
         </el-col>
@@ -165,6 +168,7 @@
 <script>
 import moment from "moment"
 import cloneDeep from "lodash/cloneDeep"
+import icons from "@/constants/icons"
 
 export default {
   name: "Game",
@@ -180,15 +184,15 @@ export default {
       firstClickedXY: [],
       secondClickedXY: [],
       successNumList: [],
-      isGameOver: true,
+      isGameOver: false,
       // Solo
       timeElapse: moment.duration(0, "s"),
       // Multiplayer
-      allPlayerScore: [6,3,5,1],
+      allPlayerScore: [],
       allPlayerSummaryInOrder: [],
       currentPlayerIndex: 0,
       winnerIndexList: [],
-
+      icons,
     }
   },
   computed: {
@@ -204,7 +208,7 @@ export default {
       handler(list) {
         let num = 6
         if (this.setup.grid === '4x4') num = 4
-        if (list.length === (num*2)) {
+        if (list.length === ((num*num) / 2)) {
           this.handleGameOver()
         }
       }, deep: true
@@ -213,12 +217,18 @@ export default {
   methods: {
     constructGrid() {
       this.grid = []
-      let numVault = []
-      let repeatNum = 6
-      if (this.setup.grid === '4x4') repeatNum = 4
+      this.actionIndex = 0
+      this.successNumList = []
+      this.firstClickedXY = []
+      this.secondClickedXY = []
 
+      let numVault = []
+      let colNum = 6
+      if (this.setup.grid === '4x4') colNum = 4
+
+      let repeatNum = (colNum * colNum) / 2
       let nextNum = 1
-      for (let i = 0; i < (repeatNum * 2); i++) {
+      for (let i = 0; i < repeatNum; i++) {
         numVault.push(nextNum)
         numVault.push(nextNum)
         nextNum++
@@ -227,9 +237,9 @@ export default {
       numVault = this.shuffleList(numVault)
       numVault = this.shuffleList(numVault) // twice better :D
 
-      for (let i = 0; i < repeatNum; i++) {
+      for (let i = 0; i < colNum; i++) {
         let row = []
-        for (let i = 0; i < repeatNum; i++) {
+        for (let i = 0; i < colNum; i++) {
           row.push(numVault.pop())
         }
         this.grid.push(row)
@@ -253,10 +263,19 @@ export default {
       return array;
     },
     resetScoring() {
-      // this.allPlayerScore = [] // change me back
+      // Solo
+      this.timeElapse = moment.duration(0, "s")
+      this.moves = 0
+
+      // Multiplayer
+      this.allPlayerSummaryInOrder = []
+      this.currentPlayerIndex = 0
+      this.winnerIndexList = []
+
+      this.allPlayerScore = []
 
       for (let i = 0; i < this.setup.noOfPlayers; i++) {
-        // this.allPlayerScore.push(0) // change me back
+        this.allPlayerScore.push(0)
       }
     },
     handleClick(x, y) {
@@ -351,7 +370,6 @@ export default {
       const highest = sorted[sorted.length-1]
 
       this.allPlayerScore.forEach((score, index) => {
-        console.log(score, index)
         let player = {
           score, index,
           isWinner: false
@@ -368,14 +386,14 @@ export default {
       this.isGameOver = true
     },
     restart() {
-      //TODO
+      this.constructGrid()
+      this.resetScoring()
+      this.isGameOver = false
     },
   },
   mounted() {
     this.constructGrid()
     this.resetScoring()
-    
-    this.handleGameOver()
   }
 }
 </script>
@@ -439,9 +457,13 @@ export default {
       width: 12rem;
       &:first-child { margin-left: 0 }
       &:last-child { margin-right: 0 }
+      &.bg-orange .block {
+        background-color: $orange !important;
+      }
       >.el-row {
         height: 100%;
         margin: 0 0.8rem;
+        
         >span {
           font-size: 15px;
         }

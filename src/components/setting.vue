@@ -6,7 +6,7 @@
     :show-close="false"
     :close-on-press-escape="false"
     :close-on-click-modal="false"
-    :modal="false"
+    :modal-append-to-body="false"
   >
     <div slot="title">
       <h2>memory</h2>

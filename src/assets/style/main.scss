@@ -23,6 +23,10 @@ body {
   height: 100%;
   width: 100%;
 }
+#setting+.v-modal {
+  background-color: $black;
+  opacity: 1;
+}
 
 h1 {
   font-size: 48px;
