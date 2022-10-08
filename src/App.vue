@@ -1,12 +1,14 @@
 
 <template>
   <div id="app">
-    <setting 
-      v-if="stage === 'setting'" 
-      @startGame="startGame"
-      :isMobile="isMobile"
-      :isTablet="isTablet"
-    />
+    <transition name="setting-bounce">
+      <setting 
+        v-show="stage === 'setting'"
+        @startGame="startGame"
+        :isMobile="isMobile"
+        :isTablet="isTablet"
+      />
+    </transition>
     <game 
       v-if="stage === 'game'" 
       :setup="setup"

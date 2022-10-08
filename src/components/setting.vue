@@ -6,7 +6,7 @@
     :show-close="false"
     :close-on-press-escape="false"
     :close-on-click-modal="false"
-    :modal-append-to-body="false"
+    :modal="false"
   >
     <div slot="title">
       <h2>memory</h2>
@@ -103,6 +103,8 @@ export default {
 @import "@/assets/style/variables.scss";
 
 #setting {
+  background-color: $black;
+  height: 100vh;
   .el-dialog {
     margin-top: 13vh !important;
     box-shadow: none;
@@ -110,7 +112,7 @@ export default {
     background-color: transparent;
   }
   .el-dialog__header {
-    background-color: $black;
+    background-color: transparent;
     text-align: center;
     padding-bottom: 2rem;
   }

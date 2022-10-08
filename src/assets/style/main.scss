@@ -54,17 +54,53 @@ h3 {
   font-size: 56px;
 }
 
-.mobile .el-dialog__wrapper {
+.el-dialog__wrapper {
   display: flex;
   justify-content: center;
   align-items: center;
   background-color: transparent;
-  height: 90vh;
+  height: 95vh;
+  overflow: hidden;
   .el-dialog {
     background-color: $white;
     border-radius: 10px;
   }
   .el-dialog__body {
     background-color: transparent;
+  }
+}
+
+
+// all transition and animation
+
+// setting-bounce
+.setting-bounce-enter-active {
+  -webkit-animation: setting-bounce-enter 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  animation: setting-bounce-enter 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+.setting-bounce-leave-active {
+  transition: transform 0.5s ease;
+  background-color: $black;
+}
+.setting-bounce-leave-to {
+  transform: translateY(-100%);
+}
+@keyframes setting-bounce-enter {
+  0% {
+    -webkit-transform: translateY(-100%);
+            transform: translateY(-100%);
+            opacity: 1;
+  }
+  40%,
+  75%,
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  60% {
+    transform: translateY(-20px);
+  }
+  85% {
+    transform: translateY(-12px);
   }
 }
