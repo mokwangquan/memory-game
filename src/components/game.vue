@@ -46,7 +46,7 @@
           v-for="score, index in allPlayerScore"
           :key="'player_'+index"
           class="no-hover"
-          :class="currentPlayerIndex === index ? 'bg-orange text-white': 'bg-idle text-light-grey'"
+          :class="getPlayerClass(index)"
         >
           <div 
             v-if="currentPlayerIndex === index" 
@@ -150,7 +150,7 @@
           justify="space-between"
           align="middle"
           class="no-hover"
-          :class="isWinner ? 'block bg-black text-white' : 'block bg-idle'"
+          :class="isWinner ? 'block bg-black text-white bounce-success' : 'block bg-idle'"
           v-for="{score, index, isWinner} in allPlayerSummaryInOrder"
           :key="'score_'+index"
         >
@@ -204,6 +204,7 @@ export default {
       firstClickedXY: [],
       secondClickedXY: [],
       successNumList: [],
+      shakeSuccessPlayerIndex: false,
       isGameOver: false,
       // Solo
       timeElapse: moment.duration(0, "s"),
@@ -346,7 +347,8 @@ export default {
         this.successNumList.push(num1)
         if (!this.isSolo) {
           this.allPlayerScore[this.currentPlayerIndex]++
-          // TODO: add animation gained point
+          this.shakeSuccessPlayerIndex = this.currentPlayerIndex
+          setTimeout(() => this.shakeSuccessPlayerIndex = null, 1000)
         }
       }
     },
@@ -355,6 +357,16 @@ export default {
       if ((this.currentPlayerIndex+1) > this.setup.noOfPlayers) {
         this.currentPlayerIndex = 0
       }
+    },
+    getPlayerClass(index) {
+      let result = 'bg-idle text-light-grey '
+      if (this.currentPlayerIndex === index) {
+        result = 'bg-orange text-white slide-up '
+      }
+      if (this.shakeSuccessPlayerIndex === index) {
+        result += 'bounce-success '
+      }
+      return result
     },
     getClass(x, y) {
       let result = ""
@@ -369,11 +381,11 @@ export default {
       const isSuccess = this.successNumList.find(el => el == this.grid[x][y]) != null
 
       if (isClicked) {
-        result += "bg-orange "
+        result += "bg-orange game-flip-left "
       } else if (isSuccess) {
         result += "bg-idle "
       } else {
-        result += "bg-black "
+        result += "bg-black game-flip-right "
       }
 
       if (
