@@ -40,7 +40,7 @@ $white: #FCFCFC;
 
 .bg-orange {
   background-color: $orange !important;
-  &:hover:not(.no-hover){
+  &:hover:not(.no-hover) {
     background-color: $orange !important;
     opacity: 0.8;
   }

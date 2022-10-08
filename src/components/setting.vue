@@ -2,7 +2,7 @@
   <el-dialog
     id="setting"
     :visible.sync="dialogVisible"
-    :width="isTablet ? '80%' : '30%'"
+    :width="isMobile ? '90%' : isTablet ? '80%' : '30%'"
     :show-close="false"
     :close-on-press-escape="false"
     :close-on-click-modal="false"
@@ -76,8 +76,8 @@
 export default {
   name: "Setting",
   props: {
-    isMobile: { type: String, required: true },
-    isTablet: { type: String, required: true },
+    isMobile: { type: Boolean, required: true },
+    isTablet: { type: Boolean, required: true },
   },
   data() {
     return {
@@ -122,6 +122,18 @@ export default {
       margin-top: 2rem;
       height: 3rem;
     }
+  }
+}
+
+.mobile #setting {
+  .el-dialog {
+    margin-top: 0 !important;
+  }
+  .el-dialog__header {
+    padding-top: 0;
+  }
+  .el-dialog__body {
+    padding: 10px 25px 20px;
   }
 }
 

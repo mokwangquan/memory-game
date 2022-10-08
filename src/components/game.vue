@@ -2,9 +2,12 @@
   <div id="game">
     <el-row type="flex" justify="space-between" align="middle">
       <h2>memory</h2>
-      <div>
+      <div v-if="!isMobile">
         <el-button class="bg-orange text-white w-auto" @click="restart()">Restart</el-button>
         <el-button class="bg-idle text-black w-auto" @click="$emit('exit')">New Game</el-button>
+      </div>
+      <div v-else>
+        <el-button class="bg-orange text-white w-auto menu-button" @click="openMenu = !openMenu">Menu</el-button>
       </div>
     </el-row>
 
@@ -57,7 +60,7 @@
             align="middle"
             class="block no-hover bg-idle"
           >
-            <span>Player {{ index + 1 }}</span>
+            <span>{{ isMobile ? 'P' : 'Player' }} {{ index + 1 }}</span>
             <h2>{{ score }}</h2>
           </el-row>
           <div 
@@ -156,11 +159,25 @@
         </el-row>
       </div>
 
-      <el-row class="action-button-row" type="flex" justify="space-between" align="middle">
+      <el-row class="action-button-row" :type="isMobile ? '' : 'flex'" justify="space-between" align="middle">
         <el-button class="bg-orange text-white" @click="restart()">Restart</el-button>
         <el-button class="bg-idle text-black" @click="$emit('exit')">Setup New Game</el-button>
       </el-row>
 
+    </el-dialog>
+
+    <!-- Mobile view menu -->
+    <el-dialog
+      id="menu-dialog"
+      :visible.sync="openMenu"
+      width="90%"
+      :show-close="false"
+      :close-on-press-escape="false"
+      :close-on-click-modal="false"
+    >
+      <el-button class="bg-orange text-white" @click="restart()">Restart</el-button>
+      <el-button class="bg-idle text-black" @click="$emit('exit')">Setup New Game</el-button>
+      <el-button class="bg-idle text-black" @click="openMenu = false">Resume Game</el-button>
     </el-dialog>
   </div>
 </template>
@@ -174,11 +191,12 @@ export default {
   name: "Game",
   props: {
     setup: { type: Object, required: true },
-    isMobile: { type: String, required: true },
-    isTablet: { type: String, required: true },
+    isMobile: { type: Boolean, required: true },
+    isTablet: { type: Boolean, required: true },
   },
   data() {
     return {
+      openMenu: false,
       grid: [],
       intervalId: null,
       moves: 0,
@@ -214,6 +232,13 @@ export default {
           this.handleGameOver()
         }
       }, deep: true
+    },
+    openMenu(isOpen) {
+      if (this.isSolo && this.moves !== 0) {
+        // only pause/resume the game if solo mode and game started
+        if (isOpen) this.stopTimer()
+        else this.startTimer(false)
+      }
     }
   },
   methods: {
@@ -286,10 +311,14 @@ export default {
 
       if (this.actionIndex === 0) {
         this.firstClickedXY = [x, y]
+        this.secondClickedXY = []
         this.actionIndex = 1
       
       // repeat
       } else if (this.actionIndex === 1) {
+        if (this.firstClickedXY[0] === x && this.firstClickedXY[1] === y) {
+          return
+        }
         this.secondClickedXY = [x, y]
         this.actionIndex = 2
         this.moves++
@@ -301,10 +330,12 @@ export default {
           this.changePlayer()
         }
 
+        this.actionIndex = 0
         setTimeout(() => {
-          this.firstClickedXY = []
-          this.secondClickedXY = []
-          this.actionIndex = 0
+          if (this.actionIndex === 0) {
+            this.firstClickedXY = []
+            this.secondClickedXY = []
+          }
         }, 500)
       }
     },
@@ -345,16 +376,21 @@ export default {
         result += "bg-black "
       }
 
-      if (this.actionIndex === 2) {
+      if (
+        this.actionIndex === 2 
+        || this.isMobile 
+        || this.isTablet
+      ) {
         result += "no-hover "
       }
+
       return result
     },
-    startTimer() {
+    startTimer(reset = true) {
       if (this.intervalId != null) {
         clearInterval(this.intervalId)
       }
-      this.timeElapse = moment.duration(0, "s")
+      if (reset) this.timeElapse = moment.duration(0, "s")
       this.intervalId = setInterval(() => {
         this.timeElapse.add(1, "s")
       }, 1000);
@@ -391,6 +427,7 @@ export default {
       this.constructGrid()
       this.resetScoring()
       this.isGameOver = false
+      this.openMenu = false
     },
   },
   mounted() {
@@ -432,8 +469,8 @@ export default {
       &.bg-black {
         color: $black;
         >div {
-          color: $white;
-          // visibility: hidden;
+          // color: $white;
+          visibility: hidden;
         }
       }
       &.bg-idle {
@@ -495,7 +532,6 @@ export default {
 
   #game-over-dialog {
     .el-dialog {
-      border-radius: 10px;
       padding: 30px;
       .el-dialog__header { display: none }
       .el-dialog__body {
@@ -523,6 +559,8 @@ export default {
   #grid {
     margin-top: 5rem;
     margin-bottom: 7rem;
+    .el-col.bg-black { @extend .no-hover }
+    .el-col.bg-idle:hover>div { visibility: visible }
     .el-col {
       &.four-by-four {
         width: 120px;
@@ -535,18 +573,6 @@ export default {
         height: 90px;
         line-height: 90px;
         font-size: 40px;
-      }
-      &.bg-black {
-        color: $black;
-        >div {
-          color: $white;
-          // visibility: hidden;
-        }
-      }
-      &.bg-idle {
-        &:hover>div {
-          visibility: hidden;
-        }
       }
     }
   }
@@ -564,6 +590,79 @@ export default {
     }
     h2 {
       margin: auto 0;
+    }
+  }
+}
+
+.mobile #game {
+  padding: 0.1rem;
+  max-width: 95vw;
+  max-height: 95vh;
+  #grid {
+    margin-top: 0.5rem;
+    .el-col.bg-black { @extend .no-hover }
+    .el-col.bg-idle:hover>div { visibility: visible }
+  }
+  .menu-button {
+    margin: auto;
+    margin-right: 5px;
+  }
+  #player-row .block h2 { margin-top: 0.1rem }
+  .block {
+    padding: 0.25rem;
+    height: 5rem;
+  }
+  .summary .block {
+    span {
+      font-size: 22px;
+    }
+    h2 {
+      margin: auto 0;
+    }
+  }
+  #solo-info-row,
+  #player-row {
+    position: absolute;
+    bottom: 1rem;
+    left: 0;
+    width: 100vw;
+    >.el-row {
+      margin: 0 5px;
+    }
+  }
+  
+
+  #menu-dialog {
+    .el-dialog {
+      .el-dialog__header { display: none }
+      .el-button {
+        margin: 1rem 0;
+      }
+    }
+  }
+  #game-over-dialog {
+    .el-dialog {
+      padding: 0;
+      h1 {
+        font-size: 25px;
+      }
+      .summary .block {
+        padding: 0.5rem;
+        height: 4rem;
+        span {
+          font-size: 18px;
+        }
+        h2 {
+          margin: auto 0;
+          font-size: 20px;
+        }
+      }
+      .action-button-row {
+        margin-top: 1rem;
+        .el-button {
+          margin: 0.5rem 0;
+        }
+      }
     }
   }
 }
