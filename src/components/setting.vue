@@ -2,7 +2,7 @@
   <el-dialog
     id="setting"
     :visible.sync="dialogVisible"
-    width="30%"
+    :width="isTablet ? '80%' : '30%'"
     :show-close="false"
     :close-on-press-escape="false"
     :close-on-click-modal="false"
@@ -75,6 +75,10 @@
 <script>
 export default {
   name: "Setting",
+  props: {
+    isMobile: { type: String, required: true },
+    isTablet: { type: String, required: true },
+  },
   data() {
     return {
       dialogVisible: true,

@@ -52,7 +52,7 @@
             &nbsp;
           </div>
           <el-row
-            type="flex"
+            :type="isTablet ? '' : 'flex'"
             justify="space-between"
             align="middle"
             class="block no-hover bg-idle"
@@ -61,7 +61,7 @@
             <h2>{{ score }}</h2>
           </el-row>
           <div 
-            v-if="currentPlayerIndex === index" 
+            v-if="!isTablet && currentPlayerIndex === index" 
             class="current-turn text-black"
           >
             CURRENT TURN
@@ -109,7 +109,7 @@
     <el-dialog
       id="game-over-dialog"
       :visible.sync="isGameOver"
-      width="35%"
+      :width="isTablet ? '90%' : '35%'"
       :show-close="false"
       :close-on-press-escape="false"
       :close-on-click-modal="false"
@@ -137,7 +137,7 @@
           class="block no-hover bg-idle"
         >
           <span>Moves Taken</span>
-          <h2>{{ moves }}</h2>
+          <h2>{{ moves }} Moves</h2>
         </el-row>
       </div>
 
@@ -173,7 +173,9 @@ import icons from "@/constants/icons"
 export default {
   name: "Game",
   props: {
-    setup: { type: Object, required: true }
+    setup: { type: Object, required: true },
+    isMobile: { type: String, required: true },
+    isTablet: { type: String, required: true },
   },
   data() {
     return {
@@ -512,6 +514,57 @@ export default {
       }
     }
   }
+
 }
 
+.tablet #game {
+  padding: 1rem;
+  max-width: 95vw;
+  #grid {
+    margin-top: 5rem;
+    margin-bottom: 7rem;
+    .el-col {
+      &.four-by-four {
+        width: 120px;
+        height: 120px;
+        line-height: 120px;
+        font-size: 50px;
+      }
+      &.six-by-six {
+        width: 90px;
+        height: 90px;
+        line-height: 90px;
+        font-size: 40px;
+      }
+      &.bg-black {
+        color: $black;
+        >div {
+          color: $white;
+          // visibility: hidden;
+        }
+      }
+      &.bg-idle {
+        &:hover>div {
+          visibility: hidden;
+        }
+      }
+    }
+  }
+  .block {
+    padding: 0.25rem;
+    height: 5rem;
+    text-align: left;
+    h2 {
+      margin-top: 0.1rem;
+    }
+  }
+  .summary .block {
+    span {
+      font-size: 22px;
+    }
+    h2 {
+      margin: auto 0;
+    }
+  }
+}
 </style>
